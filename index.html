@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="pt-BR" class="no-js">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lucas · Do atendimento ao design</title>
+  <meta name="description" content="Minha transição de Atendimento ao Cliente para Product Design: o que já estudei, o que estou estudando e como aplico na prática." />
+  <script>document.documentElement.classList.replace('no-js', 'js');</script>
+
+  <!-- Fontes: Lora (títulos e números) + Inter (textos, menu e botões) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind via CDN, com cores e fontes da página -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: '#111111',      // cor principal
+            apoio: '#8A8A8F',    // cor de apoio (decorativa)
+            titulo2: '#7A7A80',  // linha 2 do título (contraste AA para texto grande)
+            leitura: '#4A4A4F',  // texto de leitura
+            sec: '#6B6B6B',      // legendas e rótulos
+            fundo: '#F4F4F5',
+            cartao: '#ECECEE',
+            borda: '#D9D9DD',
+            vidro: '#9A9A9A',    // rótulo sobre fundo escuro
+          },
+          fontFamily: {
+            serif: ['Lora', 'Georgia', 'serif'],
+            sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
+          },
+          borderRadius: { card: '28px', hero: '32px' },
+        },
+      },
+    };
+  </script>
+
+  <!-- Componentes (botões, vidro, selos) na camada "components" do Tailwind,
+       para que as classes utilitárias possam ajustá-los quando preciso -->
+  <style type="text/tailwindcss">
+    @layer components {
+      /* ---------- Botões: leve elevação ao passar o mouse ---------- */
+      .btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+        min-height: 48px; padding: 0 1.5rem; border-radius: 9999px;
+        font-weight: 500; font-size: 15px; white-space: nowrap;
+        transition: transform .25s ease, box-shadow .25s ease, background-color .25s ease, color .25s ease;
+      }
+      .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -12px rgba(17,17,17,.45); }
+      .btn:active { transform: translateY(0); }
+      .btn-dark { background: #111111; color: #FFFFFF; }
+      .btn-outline { border: 1px solid #111111; color: #111111; background: transparent; }
+      .btn-outline:hover { background: #111111; color: #FFFFFF; }
+      .btn-light { background: #FFFFFF; color: #111111; }
+
+      /* ---------- Hero: cartão de vidro fosco ---------- */
+      .glass {
+        background: rgba(17,17,17,.55);
+        -webkit-backdrop-filter: blur(16px) saturate(120%);
+        backdrop-filter: blur(16px) saturate(120%);
+        border: 1px solid rgba(255,255,255,.14);
+      }
+
+      /* ---------- Selos de status (monocromáticos) ---------- */
+      .badge { display: inline-flex; align-items: center; gap: .375rem; height: 28px; padding: 0 .75rem; border-radius: 9999px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+      .badge--concluido { background: #111111; color: #FFFFFF; border: 1px solid #111111; }
+      .badge--andamento { background: transparent; color: #111111; border: 1px solid #111111; }
+      .badge--proximo   { background: transparent; color: #6B6B6B; border: 1px dashed #8A8A8F; }
+    }
+  </style>
+
+  <style>
+    /* ---------- Base ---------- */
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body {
+      background-color: #F4F4F5;
+      /* textura sutil de listras diagonais */
+      background-image: repeating-linear-gradient(135deg, rgba(138,138,143,.07) 0 1px, transparent 1px 12px);
+      color: #111111;
+      overflow-x: clip;
+    }
+    section[id] { scroll-margin-top: 96px; }
+    :focus-visible { outline: 2px solid #111111; outline-offset: 3px; border-radius: 10px; }
+    .on-dark :focus-visible { outline-color: #FFFFFF; }
+
+    /* ---------- Escala tipográfica (cresce de 375px a 1280px) ---------- */
+    .t-h1   { font-size: clamp(2.5rem, 2.189rem + 1.326vw, 3.25rem); line-height: 1.1; letter-spacing: -0.02em; }
+    .t-h2   { font-size: clamp(2rem, 1.586rem + 1.768vw, 3rem); line-height: 1.12; letter-spacing: -0.015em; }
+    .t-h3   { font-size: clamp(1.375rem, 1.271rem + 0.442vw, 1.625rem); line-height: 1.25; }
+    .t-step { font-size: clamp(3.5rem, 2.464rem + 4.42vw, 6rem); line-height: 1; }
+    .t-stat { font-size: clamp(2.5rem, 2.086rem + 1.768vw, 3.5rem); line-height: 1; }
+    .t-lead { font-size: clamp(1.0625rem, 1.011rem + 0.221vw, 1.1875rem); line-height: 1.6; }
+    .t-body { font-size: clamp(1rem, 0.974rem + 0.11vw, 1.0625rem); line-height: 1.65; }
+    .t-label { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; }
+
+    /* ---------- Faixa da trilha (rolagem infinita) ---------- */
+    .marquee {
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+              mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    }
+    .marquee-track { display: flex; width: max-content; animation: marquee 45s linear infinite; }
+    .marquee:hover .marquee-track { animation-play-state: paused; }
+    @keyframes marquee { to { transform: translateX(-50%); } }
+
+    /* ---------- Animações de entrada ---------- */
+    .js .reveal { opacity: 0; transform: translateY(18px); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1); transition-delay: var(--d, 0s); }
+    .js .reveal.is-visible { opacity: 1; transform: none; }
+
+    /* ---------- Modal ---------- */
+    dialog::backdrop { background: rgba(17,17,17,.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+    dialog[open] { animation: pop .3s ease; }
+    @keyframes pop { from { opacity: 0; transform: translateY(12px); } }
+
+    /* ---------- Movimento reduzido ---------- */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .js .reveal { opacity: 1; transform: none; transition: none; }
+      .marquee { -webkit-mask-image: none; mask-image: none; }
+      .marquee-track { animation: none; width: auto; flex-wrap: wrap; justify-content: center; row-gap: .75rem; }
+      .marquee-track [data-dup] { display: none; }
+      .btn, .btn:hover { transition: none; transform: none; }
+      dialog[open] { animation: none; }
+    }
+  </style>
+</head>
+
+<body class="font-sans antialiased">
+  <a href="#conteudo" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:bg-ink focus:text-white focus:px-4 focus:py-3 focus:rounded-full">Pular para o conteúdo</a>
+
+  <!-- =================================================================
+       1. MENU (fixo no topo)
+       ================================================================= -->
+  <header class="fixed inset-x-0 top-0 z-40 border-b border-borda/60 bg-fundo/80 backdrop-blur-md">
+    <nav class="mx-auto flex h-[72px] max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8" aria-label="Menu principal">
+      <!-- Logo -->
+      <a href="#inicio" class="flex min-h-[44px] items-center gap-2.5" aria-label="Lucas, voltar ao início">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <circle cx="11" cy="14" r="8" stroke="#111111" stroke-width="1.6"/>
+          <rect x="13" y="6" width="14" height="16" rx="5" fill="#111111"/>
+        </svg>
+        <span class="font-serif text-xl font-semibold tracking-tight">Lucas</span>
+      </a>
+
+      <!-- Links centralizados (computador) -->
+      <ul class="hidden items-center gap-1 lg:flex">
+        <li><a href="#inicio" class="inline-flex min-h-[44px] items-center rounded-full px-4 text-[15px] text-leitura transition-colors hover:text-ink">Início</a></li>
+        <li><a href="#o-que-estudei" class="inline-flex min-h-[44px] items-center rounded-full px-4 text-[15px] text-leitura transition-colors hover:text-ink">O que estudei</a></li>
+        <li><a href="#como-funciona" class="inline-flex min-h-[44px] items-center rounded-full px-4 text-[15px] text-leitura transition-colors hover:text-ink">Como funciona</a></li>
+        <li><a href="#contato" class="inline-flex min-h-[44px] items-center rounded-full px-4 text-[15px] text-leitura transition-colors hover:text-ink">Contato</a></li>
+      </ul>
+
+      <div class="flex items-center gap-2">
+        <button type="button" class="btn btn-dark hidden sm:inline-flex" data-open-form>Vamos conversar</button>
+        <!-- Hambúrguer (celular e tablet) -->
+        <button type="button" id="menu-abrir" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-borda bg-white/60 lg:hidden"
+                aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-mobile">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 8h16M4 16h16"/></svg>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Menu em tela cheia (celular) -->
+  <div id="menu-mobile" class="fixed inset-0 z-50 hidden flex-col bg-fundo px-4 pb-8 sm:px-6" role="dialog" aria-modal="true" aria-label="Menu">
+    <div class="flex h-[72px] items-center justify-between">
+      <span class="font-serif text-xl font-semibold">Lucas</span>
+      <button type="button" id="menu-fechar" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-borda bg-white/60" aria-label="Fechar menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <ul class="mt-8 flex flex-col gap-1">
+      <li><a href="#inicio" class="block border-b border-borda py-4 font-serif text-3xl" data-menu-link>Início</a></li>
+      <li><a href="#o-que-estudei" class="block border-b border-borda py-4 font-serif text-3xl" data-menu-link>O que estudei</a></li>
+      <li><a href="#como-funciona" class="block border-b border-borda py-4 font-serif text-3xl" data-menu-link>Como funciona</a></li>
+      <li><a href="#contato" class="block border-b border-borda py-4 font-serif text-3xl" data-menu-link>Contato</a></li>
+    </ul>
+    <button type="button" class="btn btn-dark mt-auto w-full" data-open-form data-menu-link>Vamos conversar</button>
+  </div>
+
+  <main id="conteudo">
+
+    <!-- =================================================================
+         2. HERO
+         ================================================================= -->
+    <section id="inicio" class="px-4 pt-[176px] sm:px-6 lg:px-8 lg:pt-[208px]">
+      <div class="mx-auto max-w-[1200px]">
+        <div class="relative rounded-hero border border-borda/70 bg-cartao px-5 pb-6 sm:px-10 sm:pb-10 lg:grid lg:grid-cols-12 lg:gap-10 lg:px-14 lg:pb-0">
+
+          <!-- Foto (no celular aparece acima do texto; a cabeça ultrapassa a borda do cartão) -->
+          <div class="relative mx-auto -mt-20 w-full max-w-[340px] sm:max-w-[380px] lg:order-2 lg:col-span-5 lg:mt-0 lg:max-w-none lg:self-stretch">
+            <div class="relative aspect-[4/5] lg:absolute lg:inset-x-0 lg:bottom-0 lg:-top-28 lg:aspect-auto">
+              <!--
+                Foto sem fundo (PNG transparente): a cabeça ultrapassa a borda do cartão.
+                Para trocar, substitua assets/foto-lucas.png por outro PNG sem fundo.
+                Se usar uma foto com fundo (JPG), troque o src e as classes
+                "object-top rounded-b-card lg:rounded-none" por "object-[center_20%] rounded-card lg:rounded-b-none".
+              -->
+              <img id="foto" src="assets/foto-lucas.png" alt="Foto de Lucas"
+                   class="absolute inset-0 hidden h-full w-full rounded-b-card object-cover object-top grayscale lg:rounded-none" />
+              <!-- Placeholder exibido enquanto a foto não existir -->
+              <svg id="foto-placeholder" class="absolute inset-0 h-full w-full" viewBox="0 0 400 500" role="img" aria-label="Espaço reservado para a foto de Lucas">
+                <path d="M30 500C30 372 100 318 200 318s170 54 170 182Z" fill="#D9D9DD"/>
+                <rect x="168" y="230" width="64" height="100" rx="28" fill="#D9D9DD"/>
+                <circle cx="200" cy="160" r="88" fill="#D9D9DD"/>
+                <circle cx="200" cy="160" r="88" fill="none" stroke="#8A8A8F" stroke-opacity=".35"/>
+                <path d="M30 500C30 372 100 318 200 318s170 54 170 182" fill="none" stroke="#8A8A8F" stroke-opacity=".35"/>
+              </svg>
+
+            </div>
+            <!-- Cartão de vidro fosco (no celular, sobrepõe só a base da foto para não cobrir o rosto) -->
+            <div class="glass relative z-10 mx-3 -mt-14 flex items-end gap-4 rounded-[22px] p-4 text-white max-lg:bg-ink/90 sm:mx-4 sm:p-5 lg:absolute lg:inset-x-5 lg:bottom-6 lg:mx-0 lg:mt-0">
+              <div class="min-w-0 flex-1">
+                <p class="t-label text-vidro">Em desenvolvimento</p>
+                <p class="mt-1.5 font-serif text-lg font-semibold leading-snug sm:text-xl">Aberto a novas responsabilidades</p>
+                <p class="mt-1 text-sm leading-relaxed text-white/80">Compartilho meus avanços e quero ouvir sua opinião.</p>
+              </div>
+              <button type="button" data-open-form class="on-dark btn-light inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl transition-transform hover:-translate-y-0.5 focus-visible:outline-white" aria-label="Vamos conversar: abrir formulário">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Texto -->
+          <div class="pt-8 lg:order-1 lg:col-span-7 lg:self-center lg:py-16">
+            <p class="reveal inline-flex items-center gap-2 rounded-full border border-borda bg-fundo/70 px-3.5 py-1.5 text-[13px] font-medium text-leitura">
+              Atendimento ao Cliente <span aria-hidden="true">→</span><span class="sr-only">para</span> Product Design
+            </p>
+            <h1 class="reveal t-h1 mt-6 font-serif font-medium" style="--d:.05s">
+              <span class="block text-ink">Do atendimento ao design:</span>
+              <span class="block text-titulo2">uma transição construída com método</span>
+            </h1>
+            <p class="reveal t-lead mt-6 max-w-[34rem] text-leitura" style="--d:.1s">
+              Mais de 10 anos ouvindo clientes, agora transformados em produtos mais fáceis de usar. Acompanhe como estou me preparando, etapa por etapa.
+            </p>
+            <div class="reveal mt-8 flex flex-col gap-3 sm:flex-row" style="--d:.15s">
+              <a href="#o-que-estudei" class="btn btn-dark">Ver o que estudei</a>
+              <button type="button" class="btn btn-outline" data-open-form>Vamos conversar</button>
+            </div>
+
+            <!-- Indicadores (calculados a partir de js/trilha.js) -->
+            <dl class="reveal mt-10 grid grid-cols-1 border-t border-borda sm:grid-cols-3 sm:gap-6 sm:pt-6" style="--d:.2s">
+              <div class="flex items-baseline gap-4 border-b border-borda py-4 sm:flex-col sm:items-start sm:gap-0 sm:border-0 sm:py-0">
+                <dt class="order-2 text-sm text-sec sm:mt-2">anos de atendimento</dt>
+                <dd class="t-stat order-1 min-w-[6.5rem] font-serif font-medium sm:min-w-0">10+</dd>
+              </div>
+              <div class="flex items-baseline gap-4 border-b border-borda py-4 sm:flex-col sm:items-start sm:gap-0 sm:border-0 sm:py-0">
+                <dt class="order-2 text-sm text-sec sm:mt-2">blocos de estudo</dt>
+                <dd class="t-stat order-1 min-w-[6.5rem] font-serif font-medium sm:min-w-0" data-stat="blocos">5</dd>
+              </div>
+              <div class="flex items-baseline gap-4 py-4 sm:flex-col sm:items-start sm:gap-0 sm:py-0">
+                <dt class="order-2 text-sm text-sec sm:mt-2">disciplinas concluídas</dt>
+                <dd class="t-stat order-1 min-w-[6.5rem] font-serif font-medium sm:min-w-0" data-stat="concluidas">0/20</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         3. FAIXA DA TRILHA (rolagem horizontal infinita)
+         ================================================================= -->
+    <section aria-label="Blocos da trilha de estudos" class="py-14 lg:py-20">
+      <div class="marquee overflow-hidden">
+        <ul class="marquee-track" id="faixa-trilha"><!-- preenchido por main.js --></ul>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         4. O QUE ESTUDEI (seção principal)
+         ================================================================= -->
+    <section id="o-que-estudei" class="px-4 sm:px-6 lg:px-8" aria-labelledby="titulo-estudos">
+      <div class="mx-auto max-w-[1200px]">
+        <div class="reveal max-w-2xl">
+          <p class="t-label text-sec">O que estudei</p>
+          <h2 id="titulo-estudos" class="t-h2 mt-3 font-serif font-medium">O que já estudei</h2>
+          <p class="t-lead mt-4 text-leitura">Uma trilha de 5 blocos e 20 disciplinas, montada com a liderança de design.</p>
+        </div>
+
+        <!-- Progresso geral -->
+        <div class="reveal mt-10 rounded-card border border-borda/70 bg-cartao p-6 sm:p-8 lg:grid lg:grid-cols-12 lg:items-center lg:gap-10 lg:p-10">
+          <div class="lg:col-span-4">
+            <p class="font-serif text-[clamp(3.5rem,2.9rem+2.6vw,5rem)] font-medium leading-none" data-stat="percentual">0%</p>
+            <p class="mt-2 text-sm text-sec">das disciplinas concluídas</p>
+          </div>
+          <div class="mt-6 lg:col-span-8 lg:mt-0">
+            <div class="flex h-3 w-full overflow-hidden rounded-full bg-borda" role="progressbar" aria-label="Progresso geral da trilha" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="barra-geral">
+              <span class="h-full bg-ink transition-[width] duration-700" data-barra="concluido" style="width:0%"></span>
+              <span class="h-full bg-apoio transition-[width] duration-700" data-barra="andamento" style="width:0%"></span>
+            </div>
+            <ul class="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-leitura">
+              <li class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-ink" aria-hidden="true"></span><span><strong class="font-semibold text-ink" data-stat="n-concluido">0</strong> concluídas</span></li>
+              <li class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-apoio" aria-hidden="true"></span><span><strong class="font-semibold text-ink" data-stat="n-andamento">0</strong> em andamento</span></li>
+              <li class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full border border-dashed border-apoio" aria-hidden="true"></span><span><strong class="font-semibold text-ink" data-stat="n-proximo">0</strong> próximas</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Blocos: abas no computador -->
+        <div class="reveal mt-6 hidden gap-6 lg:grid lg:grid-cols-12">
+          <div class="col-span-4 flex flex-col gap-2" role="tablist" aria-orientation="vertical" aria-label="Blocos da trilha" id="trilha-abas"></div>
+          <div class="col-span-8" id="trilha-paineis"></div>
+        </div>
+
+        <!-- Blocos: acordeão no celular e tablet -->
+        <div class="reveal mt-6 flex flex-col gap-3 lg:hidden" id="trilha-acordeao"></div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         5. BENEFÍCIOS PARA O TIME
+         ================================================================= -->
+    <section id="beneficios" class="px-4 pt-24 sm:px-6 lg:px-8 lg:pt-32" aria-labelledby="titulo-beneficios">
+      <div class="mx-auto max-w-[1200px]">
+        <div class="reveal max-w-2xl">
+          <p class="t-label text-sec">Para o time</p>
+          <h2 id="titulo-beneficios" class="t-h2 mt-3 font-serif font-medium">Benefícios para o time</h2>
+        </div>
+
+        <div class="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6">
+          <article class="reveal flex flex-col rounded-card border border-borda/70 bg-cartao p-6 sm:p-8">
+            <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-borda bg-fundo" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8.5 8.5 0 0 1-12.3 7.6L3.5 21l1.4-4.9A8.5 8.5 0 1 1 21 12Z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/></svg>
+            </span>
+            <h3 class="t-h3 mt-8 font-serif font-semibold">Um designer que já conhece o cliente por dentro</h3>
+            <p class="t-body mt-3 text-leitura">Atendi as dúvidas, frustrações e pedidos dos usuários todos os dias. Levo essa visão direto para a criação de soluções, sem precisar começar do zero.</p>
+          </article>
+
+          <article class="reveal flex flex-col rounded-card border border-borda/70 bg-cartao p-6 sm:p-8" style="--d:.08s">
+            <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-borda bg-fundo" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9v12h14V9"/><path d="M10 21v-6h4v6"/></svg>
+            </span>
+            <h3 class="t-h3 mt-8 font-serif font-semibold">Um talento da casa, pronto para crescer</h3>
+            <p class="t-body mt-3 text-leitura">Desenvolver alguém que já conhece a empresa, os processos e as pessoas exige menos tempo e menos risco do que contratar de fora.</p>
+          </article>
+
+          <article class="reveal flex flex-col rounded-card border border-borda/70 bg-cartao p-6 sm:p-8" style="--d:.16s">
+            <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-borda bg-fundo" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </span>
+            <h3 class="t-h3 mt-8 font-serif font-semibold">Progresso visível, sem surpresas</h3>
+            <p class="t-body mt-3 text-leitura">Meus estudos têm prazos, etapas claras e entregas concretas. Vocês sabem o que estou fazendo e onde estou em cada momento.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         6. COMO FUNCIONA
+         ================================================================= -->
+    <section id="como-funciona" class="px-4 pt-24 sm:px-6 lg:px-8 lg:pt-32" aria-labelledby="titulo-como">
+      <div class="mx-auto max-w-[1200px]">
+        <div class="reveal max-w-2xl">
+          <p class="t-label text-sec">Passo a passo</p>
+          <h2 id="titulo-como" class="t-h2 mt-3 font-serif font-medium">Como funciona</h2>
+        </div>
+
+        <ol class="mt-10 grid grid-cols-1 border-t border-borda lg:grid-cols-3">
+          <li class="reveal border-b border-borda py-10 md:grid md:grid-cols-12 md:gap-6 lg:block lg:border-b-0 lg:border-r lg:py-12 lg:pr-10">
+            <span class="t-step block font-serif font-medium text-titulo2 md:col-span-3" aria-hidden="true">01</span>
+            <div class="mt-6 md:col-span-9 md:mt-0 lg:mt-8">
+              <h3 class="t-h3 font-serif font-semibold"><span class="sr-only">Passo 1: </span>Estudo com direção</h3>
+              <p class="t-body mt-3 text-leitura">Sigo uma trilha de aprendizado montada com a liderança de design, com cinco blocos que vão dos fundamentos até a prática do dia a dia.</p>
+            </div>
+          </li>
+          <li class="reveal border-b border-borda py-10 md:grid md:grid-cols-12 md:gap-6 lg:block lg:border-b-0 lg:border-r lg:px-10 lg:py-12" style="--d:.08s">
+            <span class="t-step block font-serif font-medium text-titulo2 md:col-span-3" aria-hidden="true">02</span>
+            <div class="mt-6 md:col-span-9 md:mt-0 lg:mt-8">
+              <h3 class="t-h3 font-serif font-semibold"><span class="sr-only">Passo 2: </span>Prática com um problema real</h3>
+              <p class="t-body mt-3 text-leitura">Aplico o que aprendo em um desafio da nossa operação: melhorar os primeiros dias de quem chega ao time de atendimento.</p>
+            </div>
+          </li>
+          <li class="reveal border-b border-borda py-10 md:grid md:grid-cols-12 md:gap-6 lg:block lg:border-b-0 lg:py-12 lg:pl-10" style="--d:.16s">
+            <span class="t-step block font-serif font-medium text-titulo2 md:col-span-3" aria-hidden="true">03</span>
+            <div class="mt-6 md:col-span-9 md:mt-0 lg:mt-8">
+              <h3 class="t-h3 font-serif font-semibold"><span class="sr-only">Passo 3: </span>Resultados compartilhados</h3>
+              <p class="t-body mt-3 text-leitura">Apresento os avanços, o que funcionou e o que aprendi. Tudo vira um caso documentado e conectado às necessidades da empresa.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- =================================================================
+         7. CHAMADA FINAL
+         ================================================================= -->
+    <section id="contato" class="px-4 py-24 sm:px-6 lg:px-8 lg:py-32" aria-labelledby="titulo-contato">
+      <div class="mx-auto max-w-[1200px]">
+        <div class="reveal on-dark relative overflow-hidden rounded-hero bg-ink px-6 py-14 text-white sm:px-12 lg:px-20 lg:py-24">
+          <!-- listras sutis decorativas -->
+          <div class="pointer-events-none absolute inset-0 opacity-[.06]" style="background-image:repeating-linear-gradient(135deg,#fff 0 1px,transparent 1px 12px)" aria-hidden="true"></div>
+          <div class="relative max-w-3xl">
+            <p class="t-label text-vidro">Próximos passos</p>
+            <h2 id="titulo-contato" class="t-h2 mt-4 font-serif font-medium">15 minutos para eu mostrar meu progresso e ouvir sua opinião.</h2>
+            <button type="button" class="btn btn-light mt-10 h-auto w-full justify-between whitespace-normal py-3.5 text-left sm:w-auto sm:justify-center sm:text-center" data-open-form>
+              Vamos conversar sobre meus próximos passos
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><path d="M7 17 17 7M8 7h9v9"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- =================================================================
+       8. RODAPÉ
+       ================================================================= -->
+  <footer class="border-t border-borda px-4 py-10 sm:px-6 lg:px-8">
+    <div class="mx-auto flex max-w-[1200px] flex-col gap-4 text-sm text-sec sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p class="font-serif text-lg font-semibold text-ink">Lucas</p>
+        <p class="mt-1">Atendimento ao Cliente → Product Design</p>
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="https://www.linkedin.com/in/lucas-medeiros-/" class="inline-flex min-h-[44px] items-center underline decoration-borda underline-offset-4 transition-colors hover:text-ink hover:decoration-ink" target="_blank" rel="noopener" aria-label="LinkedIn de Lucas (abre em nova aba)">LinkedIn</a>
+        <p>© <span id="ano">2026</span></p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =================================================================
+       MODAL DO FORMULÁRIO
+       ================================================================= -->
+  <dialog id="modal-conversa" aria-labelledby="modal-titulo" class="w-[calc(100%-32px)] max-w-[480px] rounded-card border border-borda bg-fundo p-0 text-ink">
+    <div class="p-6 sm:p-8">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="t-label text-sec">15 minutos</p>
+          <h2 id="modal-titulo" class="mt-2 font-serif text-2xl font-medium leading-tight">Vamos conversar sobre meus próximos passos</h2>
+        </div>
+        <button type="button" class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-borda bg-white" data-close-form aria-label="Fechar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+
+      <!-- Formulário -->
+      <form id="form-conversa" class="mt-6 flex flex-col gap-4" novalidate>
+        <div>
+          <label for="campo-nome" class="text-sm font-medium">Seu nome</label>
+          <input id="campo-nome" name="nome" type="text" required autocomplete="name"
+                 class="mt-2 h-12 w-full rounded-2xl border border-borda bg-white px-4 text-base outline-none transition focus:border-ink focus-visible:outline-2" />
+        </div>
+        <div>
+          <label for="campo-horario" class="text-sm font-medium">Melhor horário para conversar</label>
+          <input id="campo-horario" name="horario" type="text" required placeholder="Ex.: terça, às 15h"
+                 class="mt-2 h-12 w-full rounded-2xl border border-borda bg-white px-4 text-base outline-none transition placeholder:text-sec focus:border-ink focus-visible:outline-2" />
+        </div>
+        <p id="form-erro" class="hidden text-sm text-ink" role="alert">Preencha os dois campos para continuar.</p>
+        <button type="submit" class="btn btn-dark mt-2 w-full">Enviar</button>
+      </form>
+
+      <!-- Confirmação -->
+      <div id="form-sucesso" class="mt-6 hidden" role="status" tabindex="-1">
+        <div class="rounded-2xl border border-borda bg-white p-5">
+          <p class="font-serif text-xl font-medium">Obrigado<span data-nome></span>!</p>
+          <p class="mt-2 text-sm leading-relaxed text-leitura">Recebi sua sugestão de horário (<span data-horario></span>). Vou te mandar um convite pela agenda ou pelo Slack para confirmarmos.</p>
+        </div>
+        <button type="button" class="btn btn-outline mt-4 w-full" data-close-form>Fechar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Dados da trilha (edite este arquivo) e interações -->
+  <script src="js/trilha.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
