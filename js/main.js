@@ -1,6 +1,6 @@
 /* =====================================================================
    INTERAÇÕES DA PÁGINA
-   Menu mobile · trilha de estudos · animações de entrada · formulário
+   Menu mobile · trilha de estudos · animações de entrada
    Os dados vêm de js/trilha.js (variável global "trilha").
    ===================================================================== */
 (function () {
@@ -245,61 +245,7 @@
   }
 
   /* =====================================================================
-     5. MODAL DO FORMULÁRIO
-     ===================================================================== */
-  function iniciarFormulario() {
-    var modal = $('#modal-conversa'), form = $('#form-conversa'), sucesso = $('#form-sucesso'), erro = $('#form-erro');
-    if (!modal || !form) return;
-
-    function abrir() {
-      form.reset();
-      form.classList.remove('hidden');
-      sucesso.classList.add('hidden');
-      erro.classList.add('hidden');
-      if (typeof modal.showModal === 'function') modal.showModal(); else modal.setAttribute('open', '');
-      $('#campo-nome').focus();
-    }
-    function fechar() { if (modal.open) modal.close(); }
-
-    $$('[data-open-form]').forEach(function (el) { el.addEventListener('click', abrir); });
-    $$('[data-close-form]', modal).forEach(function (el) { el.addEventListener('click', fechar); });
-    // Clique fora do cartão fecha o modal
-    modal.addEventListener('click', function (e) { if (e.target === modal) fechar(); });
-
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var nome = form.nome.value.trim(), horario = form.horario.value.trim();
-      if (!nome || !horario) {
-        erro.classList.remove('hidden');
-        (nome ? form.horario : form.nome).focus();
-        return;
-      }
-
-      /* -------------------------------------------------------------
-         ENVIO REAL: hoje os dados não saem do navegador.
-         Para receber as respostas, conecte um serviço aqui. Exemplo com
-         Formspree (crie um formulário em formspree.io e troque SEU_ID):
-
-           fetch('https://formspree.io/f/SEU_ID', {
-             method: 'POST',
-             body: new FormData(form),
-             headers: { Accept: 'application/json' }
-           });
-
-         Para Google Forms, use a URL "formResponse" do formulário e os
-         nomes dos campos "entry.XXXX" no lugar de "nome" e "horario".
-         ------------------------------------------------------------- */
-
-      $('[data-nome]', sucesso).textContent = ', ' + nome.split(' ')[0];
-      $('[data-horario]', sucesso).textContent = horario;
-      form.classList.add('hidden');
-      sucesso.classList.remove('hidden');
-      sucesso.focus();
-    });
-  }
-
-  /* =====================================================================
-     6. ANIMAÇÕES DE ENTRADA (fade + leve subida)
+     5. ANIMAÇÕES DE ENTRADA (fade + leve subida)
      ===================================================================== */
   function iniciarAnimacoes() {
     var els = $$('.reveal');
@@ -316,7 +262,7 @@
   }
 
   /* =====================================================================
-     7. FOTO: mostra a imagem se existir; senão, mantém o placeholder
+     6. FOTO: mostra a imagem se existir; senão, mantém o placeholder
      ===================================================================== */
   function iniciarFoto() {
     var img = $('#foto'), ph = $('#foto-placeholder');
@@ -333,7 +279,6 @@
   renderAbas();
   renderAcordeao();
   iniciarMenu();
-  iniciarFormulario();
   iniciarAnimacoes();
   iniciarFoto();
   var ano = $('#ano');

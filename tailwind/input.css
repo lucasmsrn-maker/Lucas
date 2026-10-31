@@ -1,0 +1,34 @@
+/* Entrada do Tailwind. Veja o README para recompilar css/tailwind.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* ---------- Botões: leve elevação ao passar o mouse ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+    min-height: 48px; padding: 0 1.5rem; border-radius: 9999px;
+    font-weight: 500; font-size: 15px; white-space: nowrap;
+    transition: transform .25s ease, box-shadow .25s ease, background-color .25s ease, color .25s ease;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -12px rgba(17,17,17,.45); }
+  .btn:active { transform: translateY(0); }
+  .btn-dark { background: #111111; color: #FFFFFF; }
+  .btn-outline { border: 1px solid #111111; color: #111111; background: transparent; }
+  .btn-outline:hover { background: #111111; color: #FFFFFF; }
+  .btn-light { background: #FFFFFF; color: #111111; }
+
+  /* ---------- Hero: cartão de vidro fosco ---------- */
+  .glass {
+    background: rgba(17,17,17,.55);
+    -webkit-backdrop-filter: blur(16px) saturate(120%);
+    backdrop-filter: blur(16px) saturate(120%);
+    border: 1px solid rgba(255,255,255,.14);
+  }
+
+  /* ---------- Selos de status (monocromáticos) ---------- */
+  .badge { display: inline-flex; align-items: center; gap: .375rem; height: 28px; padding: 0 .75rem; border-radius: 9999px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+  .badge--concluido { background: #111111; color: #FFFFFF; border: 1px solid #111111; }
+  .badge--andamento { background: transparent; color: #111111; border: 1px solid #111111; }
+  .badge--proximo   { background: transparent; color: #6B6B6B; border: 1px dashed #8A8A8F; }
+}
