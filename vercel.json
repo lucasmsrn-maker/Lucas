@@ -4,6 +4,11 @@
       "source": "/linkedin",
       "destination": "https://www.linkedin.com/in/lucas-medeiros-/",
       "permanent": false
+    },
+    {
+      "source": "/linkedin/",
+      "destination": "https://www.linkedin.com/in/lucas-medeiros-/",
+      "permanent": false
     }
   ],
   "headers": [
