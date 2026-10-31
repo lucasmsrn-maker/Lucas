@@ -1,4 +1,11 @@
 {
+  "redirects": [
+    {
+      "source": "/linkedin",
+      "destination": "https://www.linkedin.com/in/lucas-medeiros-/",
+      "permanent": false
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
