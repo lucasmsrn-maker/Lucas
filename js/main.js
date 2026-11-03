@@ -292,8 +292,7 @@
       return '<button type="button" role="tab" id="aba-' + i + '" aria-controls="painel-' + i + '" data-aba="' + i + '" ' +
         'class="aba group w-full rounded-[22px] border border-borda/70 p-5 text-left transition-colors">' +
         '<span class="flex items-center justify-between gap-3">' +
-          '<span class="t-label aba-sub">Bloco ' + pad(i + 1) + '</span>' +
-          '<span class="aba-sub text-[13px]">' + c.concluido + '/' + c.total + ' concluídas</span></span>' +
+          '<span class="t-label aba-sub">Bloco ' + pad(i + 1) + '</span></span>' +
         '<span class="mt-2 flex items-center gap-3 font-serif text-xl font-medium">' + icone(i, 20) + esc(b.bloco) + '</span>' +
         '<span class="aba-barra"></span></button>';
     }).join('');
@@ -356,7 +355,7 @@
         '<h3><button type="button" id="acc-btn-' + i + '" aria-expanded="' + aberto + '" aria-controls="acc-painel-' + i + '" ' +
           'class="flex min-h-[72px] w-full items-center gap-4 p-5 text-left">' +
           '<span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-borda bg-fundo">' + icone(i, 20) + '</span>' +
-          '<span class="min-w-0 flex-1"><span class="t-label block text-sec">Bloco ' + pad(i + 1) + ' · ' + c.concluido + '/' + c.total + '</span>' +
+          '<span class="min-w-0 flex-1"><span class="t-label block text-sec">Bloco ' + pad(i + 1) + '</span>' +
           '<span class="mt-1 block font-serif text-xl font-medium leading-snug">' + esc(b.bloco) + '</span>' + miniBarra(c) + '</span>' +
           '<svg class="acc-seta shrink-0 transition-transform duration-300' + (aberto ? ' rotate-180' : '') + '" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>' +
         '</button></h3>' +
