@@ -116,6 +116,60 @@
       texto + '</li>';
   }
 
+
+  /* ---------- Bloco detalhado (protótipo) ---------- */
+  var CHEV = '<svg class="shrink-0 transition-transform duration-300 group-open:rotate-180" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+  function cartaoDetalhe(d, n) {
+    var s = statusValido(d.status);
+    var rotulo = s === 'andamento' ? 'O que estou aprendendo' : 'O que aprendi';
+    var aprendi = d.aprendizado
+      ? '<p class="t-label mt-5 text-sec">' + rotulo + '</p><p class="mt-1 text-[15px] leading-relaxed text-leitura">' + esc(d.aprendizado) + '</p>'
+      : '<p class="mt-5 text-[15px] leading-relaxed text-sec">Ainda não iniciada.</p>';
+    var refs = (d.referencias || []).map(function (r) {
+      return '<li class="rounded-full border border-borda bg-cartao px-3 py-1.5 text-[13px] leading-snug text-leitura">' + esc(r) + '</li>';
+    }).join('');
+    var gupy = d.naGupy
+      ? '<div class="mt-4 rounded-2xl bg-cartao p-4"><p class="t-label text-sec">Na Gupy</p><p class="mt-1 text-[15px] leading-relaxed text-ink">' + esc(d.naGupy) + '</p></div>' : '';
+    var mais = (refs || gupy)
+      ? '<details class="group mt-5 border-t border-borda pt-1"><summary class="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-[15px] font-medium text-ink [&::-webkit-details-marker]:hidden">' +
+        'Referências e aplicação na Gupy' + CHEV + '</summary><div class="pb-1 pt-2">' +
+        (refs ? '<p class="t-label text-sec">Estudei com</p><ul class="mt-2 flex flex-wrap gap-2">' + refs + '</ul>' : '') + gupy + '</div></details>' : '';
+    return '<li class="rounded-[22px] border border-borda/70 bg-fundo p-5 sm:p-6">' +
+      '<div class="flex flex-wrap items-center justify-between gap-3"><p class="t-label text-sec">Disciplina ' + pad(d.num || n) + '</p>' + selo(s) + '</div>' +
+      '<h4 class="mt-3 font-serif text-xl font-semibold leading-snug">' + esc(d.nome) + '</h4>' +
+      (d.oQue ? '<p class="mt-2 text-[15px] leading-relaxed text-leitura">' + esc(d.oQue) + '</p>' : '') +
+      (d.porque ? '<div class="mt-4 border-l-2 border-ink pl-4"><p class="t-label text-sec">' + esc(d.porqueRotulo || 'Por que vem primeiro') + '</p><p class="mt-1 text-[15px] leading-relaxed text-ink">' + esc(d.porque) + '</p></div>' : '') +
+      aprendi + mais + '</li>';
+  }
+  function extrasBloco(b) {
+    var h = '';
+    if (b.entregavel) {
+      var e = b.entregavel;
+      h += '<div class="on-dark mt-4 rounded-[22px] bg-ink p-6 text-white sm:p-8">' +
+        '<p class="t-label text-vidro">' + esc(e.rotulo) + '</p>' +
+        '<h4 class="mt-2 font-serif text-2xl font-medium leading-snug">' + esc(e.titulo) + '</h4>' +
+        '<p class="mt-2 text-[15px] leading-relaxed text-white/80">' + esc(e.texto) + '</p>' +
+        '<ol class="mt-5 flex flex-col gap-3">' + (e.passos || []).map(function (p, i) {
+          return '<li class="flex gap-3 text-[15px] leading-snug text-white/90"><span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-white/40 text-[12px]">' + (i + 1) + '</span><span>' + esc(p) + '</span></li>';
+        }).join('') + '</ol></div>';
+    }
+    if (b.criterios && b.criterios.length) {
+      h += '<div class="mt-4 rounded-[22px] border border-borda/70 bg-fundo p-5 sm:p-6"><p class="t-label text-sec">Para dar o bloco como fechado</p><ul class="mt-3 flex flex-col gap-2">' +
+        b.criterios.map(function (c) {
+          var ic = c.ok ? STATUS.concluido.svg : STATUS.proximo.svg;
+          return '<li class="flex items-start gap-3 text-[15px] leading-snug text-ink"><span class="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-borda bg-cartao text-ink">' + ic + '</span><span>' + esc(c.texto) + '</span></li>';
+        }).join('') + '</ul></div>';
+    }
+    return h;
+  }
+  function corpoBloco(b, topo) {
+    var ds = b.disciplinas || [];
+    if (ds.some(function (d) { return d.porque || d.oQue; })) {
+      return '<ul class="' + topo + ' flex flex-col gap-4">' + ds.map(function (d, i) { return cartaoDetalhe(d, i + 1); }).join('') + '</ul>' + extrasBloco(b);
+    }
+    return '<ul class="' + topo + ' grid grid-cols-1 gap-4 ' + (topo === 'mt-6' ? 'grid-cols-2' : 'md:grid-cols-2') + '">' + ds.map(cartaoDisciplina).join('') + '</ul>';
+  }
+
   function miniBarra(c, claro) {
     var pct = c.total ? (c.concluido / c.total) * 100 : 0;
     return '<span class="mt-3 block h-1.5 w-full overflow-hidden rounded-full ' + (claro ? 'bg-white/20' : 'bg-borda') + '" aria-hidden="true">' +
@@ -145,11 +199,12 @@
       return '<div role="tabpanel" id="painel-' + i + '" aria-labelledby="aba-' + i + '" tabindex="0" hidden ' +
         'class="h-full rounded-card border border-borda/70 bg-cartao p-8">' +
         '<div class="flex items-end justify-between gap-6">' +
-          '<div><p class="t-label text-sec">Bloco ' + pad(i + 1) + '</p>' +
+          '<div><p class="t-label text-sec">Bloco ' + pad(i + 1) + (b.periodo ? ' · ' + esc(b.periodo) : '') + '</p>' +
           '<h3 class="t-h3 mt-2 font-serif font-semibold">' + esc(b.bloco) + '</h3></div>' +
           '<p class="text-sm text-sec"><strong class="font-serif text-3xl font-medium text-ink">' + c.concluido + '</strong>/' + c.total + ' concluídas</p>' +
         '</div>' +
-        '<ul class="mt-6 grid grid-cols-2 gap-4">' + ds.map(cartaoDisciplina).join('') + '</ul></div>';
+        (b.objetivo ? '<p class="mt-4 max-w-xl text-[15px] leading-relaxed text-leitura">' + esc(b.objetivo) + '</p>' : '') +
+        corpoBloco(b, 'mt-6') + '</div>';
     }).join('');
 
     function ativar(i, foco) {
@@ -203,7 +258,8 @@
           '<svg class="acc-seta shrink-0 transition-transform duration-300' + (aberto ? ' rotate-180' : '') + '" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>' +
         '</button></h3>' +
         '<div id="acc-painel-' + i + '" role="region" aria-labelledby="acc-btn-' + i + '"' + (aberto ? '' : ' hidden') + ' class="px-5 pb-5">' +
-          '<ul class="grid grid-cols-1 gap-3 md:grid-cols-2">' + ds.map(cartaoDisciplina).join('') + '</ul></div></div>';
+          (b.objetivo ? '<p class="mb-4 text-[15px] leading-relaxed text-leitura">' + esc(b.objetivo) + '</p>' : '') +
+          corpoBloco(b, 'mt-0') + '</div></div>';
     }).join('');
 
     raiz.addEventListener('click', function (e) {
