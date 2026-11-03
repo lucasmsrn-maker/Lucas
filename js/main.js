@@ -162,10 +162,114 @@
     }
     return h;
   }
+
+  /* ---------- Guia completo (conteúdo do PDF, dentro do Bloco 1) ---------- */
+  var guiaDados = (typeof guia !== 'undefined') ? guia : null;
+  var P = 'text-[15px] leading-relaxed text-leitura';
+  function chips(lista) {
+    return '<ul class="mt-3 flex flex-wrap gap-2">' + (lista || []).map(function (r) {
+      return '<li class="rounded-full border border-borda bg-fundo px-3 py-1.5 text-[13px] leading-snug text-leitura">' + esc(r) + '</li>';
+    }).join('') + '</ul>';
+  }
+  function caixaGupy(texto) {
+    return texto ? '<div class="mt-4 rounded-2xl bg-fundo p-4"><p class="t-label text-sec">Na Gupy</p><p class="mt-1 text-[15px] leading-relaxed text-ink">' + esc(texto) + '</p></div>' : '';
+  }
+  function marca(ok) {
+    return '<span class="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-borda bg-cartao text-ink">' + (ok ? STATUS.concluido.svg : STATUS.proximo.svg) + '</span>';
+  }
+  function listaPontos(itens) {
+    return '<ul class="mt-3 flex flex-col gap-2">' + (itens || []).map(function (t) {
+      return '<li class="flex gap-2.5 text-[15px] leading-snug text-leitura"><span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-apoio" aria-hidden="true"></span><span>' + esc(t) + '</span></li>';
+    }).join('') + '</ul>';
+  }
+  function passosNumerados(passos) {
+    return '<ol class="mt-4 flex flex-col gap-3">' + (passos || []).map(function (t, i) {
+      return '<li class="flex gap-3 text-[15px] leading-snug text-leitura"><span class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-borda bg-fundo text-[12px] text-ink">' + (i + 1) + '</span><span>' + esc(t) + '</span></li>';
+    }).join('') + '</ol>';
+  }
+  function criteriosHtml(lista) {
+    return '<ul class="mt-3 flex flex-col gap-2">' + (lista || []).map(function (c) {
+      return '<li class="flex items-start gap-3 text-[15px] leading-snug text-ink">' + marca(c.ok) + '<span>' + esc(c.texto) + '</span></li>';
+    }).join('') + '</ul>';
+  }
+  function colunasHtml(cols, n) {
+    return '<div class="grid gap-3 ' + (n === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3') + '">' + cols.map(function (c) {
+      return '<div class="rounded-2xl border border-borda/70 bg-cartao p-4"><p class="t-label text-sec">' + esc(c.titulo) + '</p>' + listaPontos(c.itens) + '</div>';
+    }).join('') + '</div>';
+  }
+  function itemGuia(it) {
+    switch (it.t) {
+      case 'p': return '<p class="' + P + '">' + esc(it.texto) + '</p>';
+      case 'h': return '<h4 class="font-serif text-lg font-semibold leading-snug text-ink">' + esc(it.texto) + '</h4>';
+      case 'nota': return '<p class="text-[13px] leading-relaxed text-sec">' + esc(it.texto) + '</p>';
+      case 'destaque':
+        return '<div class="rounded-2xl border-l-4 ' + (it.tom === 'armadilha' ? 'border-apoio' : 'border-ink') + ' bg-cartao p-4 sm:p-5"><p class="t-label text-sec">' + esc(it.rotulo) + '</p><p class="mt-1 text-[15px] leading-relaxed text-ink">' + esc(it.texto) + '</p></div>';
+      case 'tabela': {
+        var cab = '<div class="hidden gap-4 border-b border-borda pb-2 md:grid md:grid-cols-3">' + it.cab.map(function (c) { return '<p class="t-label text-sec">' + esc(c) + '</p>'; }).join('') + '</div>';
+        var linhas = it.linhas.map(function (l) {
+          return '<div class="grid gap-3 border-b border-borda py-4 md:grid-cols-3 md:gap-4">' + l.map(function (c, i) {
+            return '<div><p class="t-label mb-1 text-sec md:hidden">' + esc(it.cab[i]) + '</p><p class="text-[15px] leading-relaxed ' + (i === 0 ? 'font-medium text-ink' : 'text-leitura') + '">' + esc(c) + '</p></div>';
+          }).join('') + '</div>';
+        }).join('');
+        return '<div>' + cab + linhas + '</div>';
+      }
+      case 'linhas':
+        return '<div><h4 class="font-serif text-lg font-semibold leading-snug text-ink">' + esc(it.titulo) + '</h4><dl class="mt-3 border-t border-borda">' + it.linhas.map(function (l) {
+          return '<div class="grid gap-1 border-b border-borda py-3 md:grid-cols-[150px_1fr] md:gap-4"><dt class="t-label pt-0.5 text-sec">' + esc(l[0]) + '</dt><dd class="' + P + '">' + esc(l[1]) + '</dd></div>';
+        }).join('') + '</dl></div>';
+      case 'lista':
+        return '<div><h4 class="font-serif text-lg font-semibold leading-snug text-ink">' + esc(it.titulo) + '</h4>' + (it.intro ? '<p class="mt-2 ' + P + '">' + esc(it.intro) + '</p>' : '') + listaPontos(it.itens) + '</div>';
+      case 'colunas': return colunasHtml(it.cols, it.n);
+      case 'tituladas':
+        return '<div class="flex flex-col gap-4">' + it.itens.map(function (x) {
+          return '<div class="border-l-2 border-ink pl-4"><h4 class="font-serif text-lg font-semibold leading-snug text-ink">' + esc(x[0]) + '</h4><p class="mt-1 ' + P + '">' + esc(x[1]) + '</p></div>';
+        }).join('') + '</div>';
+      case 'checklist':
+        return '<ul class="flex flex-col gap-2">' + it.itens.map(function (c) {
+          return '<li class="flex items-start gap-3 rounded-2xl border border-borda/70 bg-cartao px-4 py-3 text-[15px] leading-snug text-ink">' + marca(c.ok) + '<span>' + esc(c.texto) + '</span></li>';
+        }).join('') + '</ul>';
+      case 'disc':
+        return '<article class="rounded-[20px] border border-borda/70 bg-cartao p-5"><p class="t-label text-sec">Disciplina ' + pad(it.num) + '</p>' +
+          '<h5 class="mt-2 font-serif text-lg font-semibold leading-snug text-ink">' + esc(it.nome) + '</h5>' +
+          '<p class="mt-2 ' + P + '">' + esc(it.texto) + '</p>' +
+          (it.chave ? '<p class="mt-3 ' + P + '"><strong class="font-semibold text-ink">' + esc(it.chave[0]) + '</strong> ' + esc(it.chave[1]) + '</p>' : '') +
+          chips(it.refs) + caixaGupy(it.gupy) + '</article>';
+      case 'projeto':
+        return '<article class="rounded-[20px] border border-borda/70 bg-cartao p-5 sm:p-6"><p class="t-label text-sec">' + esc(it.rotulo) + '</p>' +
+          '<h5 class="mt-2 font-serif text-xl font-semibold leading-snug text-ink">' + esc(it.titulo) + '</h5>' +
+          '<p class="mt-2 ' + P + '">' + esc(it.texto) + '</p>' + passosNumerados(it.passos) + '</article>';
+      case 'fase':
+        return '<article class="rounded-[20px] border border-borda/70 bg-cartao p-5 sm:p-6">' +
+          '<div class="flex items-baseline gap-4"><span class="font-serif text-4xl font-medium leading-none text-ink">' + esc(it.num) + '</span><div><p class="t-label text-sec">' + esc(it.periodo) + ' · ' + esc(it.area) + '</p></div></div>' +
+          '<h5 class="mt-3 font-serif text-xl font-semibold leading-snug text-ink">' + esc(it.titulo) + '</h5>' +
+          '<p class="mt-2 ' + P + '"><strong class="font-semibold text-ink">Objetivo:</strong> ' + esc(it.objetivo) + '</p>' +
+          '<div class="mt-4">' + colunasHtml([{ titulo: 'Estudar', itens: it.estudar }, { titulo: 'Praticar', itens: it.praticar }, { titulo: 'Conectar', itens: it.conectar }], 3) + '</div>' +
+          '<div class="mt-4 rounded-2xl bg-fundo p-4"><p class="t-label text-sec">Entregável</p><p class="mt-1 text-[15px] leading-relaxed text-ink">' + esc(it.entregavel) + '</p></div>' +
+          '<p class="t-label mt-4 text-sec">Critérios de saída</p>' + criteriosHtml(it.criterios) + '</article>';
+      default: return '';
+    }
+  }
+  function secaoGuia(sec) {
+    return '<details class="group mt-3 rounded-[22px] border border-borda/70 bg-fundo"><summary class="flex min-h-[64px] cursor-pointer list-none items-center justify-between gap-4 p-5 [&::-webkit-details-marker]:hidden">' +
+      '<span class="min-w-0"><span class="t-label block text-sec">Seção ' + esc(sec.num) + '</span><span class="mt-1 block font-serif text-lg font-semibold leading-snug">' + esc(sec.titulo) + '</span></span>' + CHEV + '</summary>' +
+      '<div class="flex flex-col gap-5 border-t border-borda px-5 pb-6 pt-5 sm:px-6">' + sec.itens.map(itemGuia).join('') + '</div></details>';
+  }
+  function guiaHtml() {
+    var g = guiaDados;
+    return '<div class="mt-10 border-t border-borda pt-8">' +
+      '<p class="t-label text-sec">' + esc(g.rotulo) + '</p>' +
+      '<h3 class="t-h3 mt-2 font-serif font-semibold">' + esc(g.titulo) + '</h3>' +
+      '<p class="mt-3 max-w-xl ' + P + '">' + esc(g.intro) + '</p>' +
+      '<dl class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-5">' + g.resumo.map(function (r) {
+        return '<div class="rounded-2xl border border-borda/70 bg-fundo p-4"><dt class="t-label text-sec">' + esc(r[0]) + '</dt><dd class="mt-1 font-serif text-lg font-medium leading-tight text-ink">' + esc(r[1]) + '</dd></div>';
+      }).join('') + '</dl>' +
+      '<div class="mt-6">' + g.secoes.map(secaoGuia).join('') + '</div></div>';
+  }
+
   function corpoBloco(b, topo) {
     var ds = b.disciplinas || [];
     if (ds.some(function (d) { return d.porque || d.oQue; })) {
-      return '<ul class="' + topo + ' flex flex-col gap-4">' + ds.map(function (d, i) { return cartaoDetalhe(d, i + 1); }).join('') + '</ul>' + extrasBloco(b);
+      return '<ul class="' + topo + ' flex flex-col gap-4">' + ds.map(function (d, i) { return cartaoDetalhe(d, i + 1); }).join('') + '</ul>' + extrasBloco(b) + (guiaDados && guiaDados.bloco === b.bloco ? guiaHtml() : '');
     }
     return '<ul class="' + topo + ' grid grid-cols-1 gap-4 ' + (topo === 'mt-6' ? 'grid-cols-2' : 'md:grid-cols-2') + '">' + ds.map(cartaoDisciplina).join('') + '</ul>';
   }
