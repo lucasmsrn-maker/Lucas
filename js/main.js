@@ -305,7 +305,6 @@
         '<div class="flex items-end justify-between gap-6">' +
           '<div><p class="t-label text-sec">Bloco ' + pad(i + 1) + (b.periodo ? ' · ' + esc(b.periodo) : '') + '</p>' +
           '<h3 class="t-h3 mt-2 font-serif font-semibold">' + esc(b.bloco) + '</h3></div>' +
-          '<p class="text-sm text-sec"><strong class="font-serif text-3xl font-medium text-ink">' + c.concluido + '</strong>/' + c.total + ' concluídas</p>' +
         '</div>' +
         (b.objetivo ? '<p class="mt-4 max-w-xl text-[15px] leading-relaxed text-leitura">' + esc(b.objetivo) + '</p>' : '') +
         corpoBloco(b, 'mt-6') + '</div>';
